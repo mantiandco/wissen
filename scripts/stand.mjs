@@ -57,11 +57,19 @@ const ersterAbsatz = (rest) => {
   return abs[0] ?? '';
 };
 
+/* Zeilenweise, nicht per Regex bis zum Dateiende: JavaScript kennt kein \Z,
+   und ein lazy-Muster endete am ersten großen Z im Text (Auftrag 287). */
 const offenBlock = (rest) => {
-  const m = rest.match(/^## Offen\s*\n([\s\S]*?)(?=^## |\Z)/m);
-  if (!m) return null;
-  const zeilen = m[1].trim();
-  return zeilen || null;
+  const zeilen = rest.split('\n');
+  const start = zeilen.findIndex((z) => /^## Offen\s*$/.test(z));
+  if (start < 0) return null;
+  const block = [];
+  for (const z of zeilen.slice(start + 1)) {
+    if (/^## /.test(z)) break;
+    block.push(z);
+  }
+  const text = block.join('\n').trim();
+  return text || null;
 };
 
 export const kopfzeile = (root, bereich) => {
