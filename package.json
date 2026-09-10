@@ -1,0 +1,15 @@
+{
+  "name": "mantiandco-wissen",
+  "private": true,
+  "description": "Das Wissen von MANTI & CO. — reiner Text in git, Journal statt Monolith, Stand erzeugt, Gatter davor.",
+  "type": "module",
+  "scripts": {
+    "pruefen": "node scripts/pruefen.mjs",
+    "stand": "node scripts/stand.mjs",
+    "geheimnis": "node scripts/geheimnis-hash.mjs",
+    "wanderung": "node scripts/wanderung.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
