@@ -38,7 +38,9 @@
 
 **Bereichsdatei:** Halal ohne Ausnahme, Kennzeichnung nach LMIV je Gericht, Lieferantenauskünfte belegen jeden Chip; offene Herstellerfragen halten das diet-Gatter rot (6 Angaben, Stand 287). (`bereiche/kennzeichnung.md`)
 
-**Jüngster Eintrag:** (kein Journal-Eintrag)
+**Jüngster Eintrag:** 2026-10-01 · 289 · Auftrag 289 — Herstellerbelege, Nudelsalat raus, Cassis rein (`journal/2026-10-01-289-herstellerbelege-nudelsalat-raus-cassis-rein.md`)
+
+**Belege:** Drei METRO-Artikelspezifikationen vom 22.09.2026 liegen unter `unterlagen/metro/` (Käsekuchen = Cheesecake, Gâteaux au chocolat = Schoko-Soufflé, Kartoffelsalat), je mit Begleitdatei; die Ankreuzfelder sind Grafik und wurden am gerenderten Bild gelesen. Sie erklären Cheesecake und Soufflé für vegetarisch, den Kartoffelsalat für vegan — und alle drei für „Halal: Nein“. Das diet-Gatter kennt seit diesem Auftrag das Feld `herstellererklaerung` (art, quelle): Sie belegt die unbekannten Stoffe genau dieses Gerichts, wenn sie den Chip deckt; ein bekannter Widerspruch bleibt ein Widerspruch. Gegenproben: „vegetarisch“ an einem vegan-Chip fällt, eine Erklärung ohne Quelle fällt (am Bau schon). **diet-check 6 → 2, wie vorab abgeleitet** — offen ist nur noch Xanthan in Pommes frites und Süßkartoffel-Pommes. Die Zutatenlisten der drei Gerichte stehen auf dem Wortlaut der Spezifikation (Mengenanteile, „ungehärtetes Kopraöl“ statt „Kokosöl“), Wörterbuch im selben Commit.
 
 ## marketing
 

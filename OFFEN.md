@@ -11,6 +11,14 @@
 - Website, Code: pages.dev per Access-Policy schließen (Taib-Klick + Beleg) · Hero DPR 3 (1120er 168 kB) · Nährwerte (bei allen 27 null) · Hauptversionen aus `npm audit` (astro ≤ 7.2.7 critical, puppeteer, esbuild — je eigener Auftrag mit Byteprobe) · diet-Gatter rot, bis die vier Herstellerfragen beantwortet sind.
 - Für den Chat: Taib legt `STAND.md` und `OFFEN.md` ins Projektwissen, bis ein Zugang das ersetzt.
 
+## kennzeichnung
+
+### 2026-10-01 · 289 · Auftrag 289 — Herstellerbelege, Nudelsalat raus, Cassis rein (`journal/2026-10-01-289-herstellerbelege-nudelsalat-raus-cassis-rein.md`)
+
+- Xanthan in Pommes frites und Süßkartoffel-Pommes: Herstellerauskunft oder -erklärung fehlt — dann diet-check grün.
+- Halal und das Sortiment: Die Spezifikationen von Cheesecake, Schoko-Soufflé und Kartoffelsalat sagen „Halal: Nein“. Die Website behauptet für diese Gerichte nichts dergleichen; der Grundsatz im Wissen („Was nicht halal ist, kommt nicht auf die Karte“, Archiv 15) widerspricht dem Sortiment aber — Taibs Entscheidung, ob „Nein“ hier „nicht zertifiziert“ heißt und was das für den Grundsatz bedeutet. Dazu: `HalalDiet` im JSON-LD der vier Fleischgerichte gilt für das ganze Gericht, auch für die wählbare Pesto-Rosso-Sauce mit Grana Padano (tierisches Lab).
+- Nährwerte aus den Spezifikationen: nicht übernommen, Entscheidung offen.
+
 ## firma
 
 ### 2026-10-01 · 288 · Auftrag 288 — Unterlagen ins Wissen (`journal/2026-10-01-288-unterlagen-ins-wissen.md`)

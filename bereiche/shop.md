@@ -98,3 +98,9 @@ Beides ist im Backend nicht beeinflussbar.
 ## 13.7 `www` — Entscheidung
 
 **Die Bestellstrecke läuft durchgehend auf `www.mantiandco.com`.** Entscheidung: Die Unternehmensseite läuft ebenfalls auf `www`, `mantiandco.com` leitet dauerhaft dorthin. Für das Hosting: 301-Weiterleitung von der Fassung ohne `www`, `www` als kanonische Adresse in allen Verweisen.
+
+## Unterlagen (seit Eintrag 289)
+
+- `unterlagen/foodamigos-antwort-2026-09.md` — Antwort von Foodamigos auf die Fragenliste (A Rechtliches, B Technik, C Datenschutz), September 2026. Die Korrespondenz ist abgeschlossen; offen bleibt nur B1 (noindex der Bestellstrecke), das Foodamigos intern prüft.
+
+*Geändert mit Eintrag 289.*

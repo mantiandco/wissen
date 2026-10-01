@@ -467,3 +467,10 @@ Elf Fragenblöcke: Warum die Zertifizierung nicht auf der eigenen Website steht 
 **Falls alle fünf dieselbe unbelegte Struktur haben wie heute**, ist die Konsequenz nicht der Wechsel, sondern eine zurückhaltendere Formulierung auf `/halal`.
 
 **Lieferantenauskünfte** stehen nicht hier, sondern in den Aufnahme-Dateien unter `unterlagen/` (`Beilagen-Kennzeichnung-Aufnahme.md`, Archiv 11.46; `Getraenke-Kennzeichnung-Aufnahme.md`, Archiv 11.49) — *geändert mit Eintrag 288* und im Wörterbuch `src/data/kennzeichnung-woerterbuch.json` der Website.
+
+## Unterlagen (seit Eintrag 289)
+
+- `unterlagen/metro/` — METRO-Artikelspezifikationen vom 22.09.2026, je PDF mit Begleitdatei: 4337182262039 Käsekuchen (= Cheesecake), 4337182343981 Gâteaux au chocolat (= Schoko-Soufflé), 4018905504741 Kartoffelsalat. Sie tragen die Herstellererklärung „vegetarisch“ bzw. „vegan“, die das diet-Gatter seit 289 als Beleg liest, und alle drei „Halal: Nein“.
+- `unterlagen/etiketten/elephant-bay-cassis.jpg` mit Begleitdatei — Etikett der Cassis-Limonade (Foto Taib, 1. Oktober 2026); Quelle der Kennzeichnung, nicht der Händler.
+
+*Geändert mit Eintrag 289.*

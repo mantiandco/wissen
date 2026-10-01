@@ -42,9 +42,12 @@ export const TYPEN = ['auftrag', 'entscheidung', 'befund', 'berichtigung', 'lehr
 export const STATUS = ['gilt', 'aufgehoben'];
 
 /* unterlagen/ (seit Auftrag 288): abgenommene Quelldokumente, wörtlich, mit
- * Kopf datum · bereich · status · verweis · quelle. Nur „abgenommen“ —
- * ein Entwurf ist kein Wissen, sondern eine Aufgabe. */
-export const UNTERLAGEN_STATUS = ['abgenommen'];
+ * Kopf datum · bereich · status · verweis · quelle. „abgenommen“ für Quellen,
+ * „abgeschlossen“ für eine beendete Korrespondenz (seit 289) — ein Entwurf ist
+ * kein Wissen, sondern eine Aufgabe. Unterordner sind erlaubt; eine Datei, die
+ * kein Markdown ist (PDF, Foto), braucht eine Begleitdatei gleichen Namens
+ * mit .md, die ihren Kopf trägt. */
+export const UNTERLAGEN_STATUS = ['abgenommen', 'abgeschlossen'];
 
 /* `kennung` oder `kennung#N` → { kennung, punkt } */
 export const erledigtVerweis = (s) => {

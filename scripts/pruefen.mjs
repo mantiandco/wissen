@@ -147,11 +147,21 @@ export function pruefe(root, { pruefsummen = WORTPRUEFSUMMEN, standPruefen = tru
   /* Unterlagen — abgenommene Quelldokumente, wörtlich, mit Kopf. */
   const udir = join(root, 'unterlagen');
   zahl.unterlagen = 0;
-  for (const name of existsSync(udir) ? readdirSync(udir).sort() : []) {
-    if (name === '.DS_Store') continue;
+  const alleUnterlagen = (dir, rel = '') =>
+    existsSync(dir)
+      ? readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+          e.name === '.DS_Store' ? [] : e.isDirectory() ? alleUnterlagen(join(dir, e.name), `${rel}${e.name}/`) : [`${rel}${e.name}`]
+        )
+      : [];
+  const unterlagenListe = alleUnterlagen(udir).sort();
+  for (const name of unterlagenListe) {
     zahl.unterlagen += 1;
     const ort = `unterlagen/${name}`;
-    if (!name.endsWith('.md')) { fehler.push(`${ort}: nur .md-Dateien`); continue; }
+    if (!name.endsWith('.md')) {
+      const begleit = name.replace(/\.[^./]+$/, '.md');
+      if (!unterlagenListe.includes(begleit)) fehler.push(`${ort}: keine Begleitdatei ${begleit} mit Kopf`);
+      continue;
+    }
     const { felder, fehler: kf } = kopf(readFileSync(join(udir, name), 'utf8'));
     for (const f of kf) fehler.push(`${ort}: ${f}`);
     if (!felder) continue;
@@ -233,6 +243,7 @@ gefallen += probe('Dateiname passt nicht zum Kopf → rot', ({ eintrag }) => ein
 gefallen += probe('aufgehobene Entscheidung ohne Nachfolger → rot', ({ dir }) => writeFileSync(join(dir, 'entscheidungen', '0001-alt.md'), '---\nstatus: aufgehoben\naufgehoben_durch: 0009\n---\n# Alt\n'), (f) => f.some((x) => x.includes('aufgehoben_durch nennt 0009')));
 gefallen += probe('Datei außerhalb der Form → rot', ({ dir }) => writeFileSync(join(dir, 'NOTIZ.txt'), 'x'), (f) => f.some((x) => x.includes('außerhalb der Form: NOTIZ.txt')));
 gefallen += probe('STAND.md nicht aktuell → rot', ({ dir }) => writeFileSync(join(dir, 'STAND.md'), '# Stand\n\nveraltet\n'), (f) => f.some((x) => x.includes('STAND.md ist nicht aktuell')));
+gefallen += probe('Unterlage ohne Begleitdatei → rot', ({ dir }) => { mkdirSync(join(dir, 'unterlagen', 'metro'), { recursive: true }); writeFileSync(join(dir, 'unterlagen', 'metro', 'a.pdf'), '%PDF'); }, (f) => f.some((x) => x.includes('unterlagen/metro/a.pdf: keine Begleitdatei')));
 gefallen += probe('Unterlage ohne status → rot', ({ dir }) => { mkdirSync(join(dir, 'unterlagen')); writeFileSync(join(dir, 'unterlagen', 'x.md'), '---\ndatum: 2026-09-02\nbereich: marketing\nverweis: 276\n---\n# X\n'); }, (f) => f.some((x) => x.includes('unterlagen/x.md: status')));
 gefallen += probe('erledigt kennung#N außerhalb der Punkte → rot', ({ eintrag }) => {
   eintrag('2026-09-02-277-offen.md', 'datum: 2026-09-02\nnummer: 277\nbereich: shop\ntyp: befund\nautor: taib', '# Offenes\n\n## Offen\n- Punkt A\n- Punkt B\n');
@@ -252,7 +263,7 @@ gefallen += probe('erledigt nimmt Offenes aus OFFEN.md', ({ eintrag, dir }) => {
   writeFileSync(join(dir, 'OFFEN.md'), offen);
   if (offen.includes('Punkt A')) writeFileSync(join(dir, 'lehren', 'x.md'), 'Punkt A steht noch in OFFEN');
 }, (f) => !f.some((x) => x.includes('lehren/x.md')));
-console.log(`  ${16 - gefallen} von 16 Proben bestanden.\n`);
+console.log(`  ${17 - gefallen} von 17 Proben bestanden.\n`);
 if (gefallen) {
   console.log('PRUEFEN GATE: FAIL (Selbsttest)');
   process.exit(1);
