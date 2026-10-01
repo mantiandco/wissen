@@ -42,7 +42,7 @@
 
 ## marketing
 
-**Bereichsdatei:** Hebel außerhalb des Codes laufen nach `Hebel-ausserhalb-des-Codes.md` (Projektwissen, nicht im Repositorium); der Ausgangswert der Search Console vor dem Livegang steht unten, spätere Messungen im Journal. (`bereiche/marketing.md`)
+**Bereichsdatei:** Hebel außerhalb des Codes laufen nach `unterlagen/Hebel-ausserhalb-des-Codes.md` (Stand 9. September 2026); der Ausgangswert der Search Console vor dem Livegang steht unten, spätere Messungen im Journal. (`bereiche/marketing.md`)
 
 **Jüngster Eintrag:** (kein Journal-Eintrag)
 
@@ -56,4 +56,6 @@
 
 **Bereichsdatei:** MANTI & CO. GmbH, Mannheim — Produktionsküche ohne Gastraum, Lieferung und Abholung; Stammdaten und Liefergebiete stehen unten, Betrieb und Aufträge im Journal. (`bereiche/firma.md`)
 
-**Jüngster Eintrag:** (kein Journal-Eintrag)
+**Jüngster Eintrag:** 2026-10-01 · 288 · Auftrag 288 — Unterlagen ins Wissen (`journal/2026-10-01-288-unterlagen-ins-wissen.md`)
+
+**Taibs Meldung:** Die Öffnungszeiten sind bei Google, Lieferando und Foodamigos auf täglich 11:00–21:00 angepasst (September 2026) — damit stimmen alle Kanäle mit der Website seit Auftrag 282 überein. Dieser Teil des Sammelpunkts 4 aus Eintrag 287 ist erledigt; die übrigen Teile dieses Punkts stehen unten weiter offen.

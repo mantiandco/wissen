@@ -466,4 +466,4 @@ Elf Fragenblöcke: Warum die Zertifizierung nicht auf der eigenen Website steht 
 
 **Falls alle fünf dieselbe unbelegte Struktur haben wie heute**, ist die Konsequenz nicht der Wechsel, sondern eine zurückhaltendere Formulierung auf `/halal`.
 
-**Lieferantenauskünfte** stehen nicht hier, sondern in den Aufnahme-Dateien im Projektwissen (`Beilagen-Kennzeichnung-Aufnahme.md`, Archiv 11.46) und im Wörterbuch `src/data/kennzeichnung-woerterbuch.json` der Website.
+**Lieferantenauskünfte** stehen nicht hier, sondern in den Aufnahme-Dateien unter `unterlagen/` (`Beilagen-Kennzeichnung-Aufnahme.md`, Archiv 11.46; `Getraenke-Kennzeichnung-Aufnahme.md`, Archiv 11.49) — *geändert mit Eintrag 288* und im Wörterbuch `src/data/kennzeichnung-woerterbuch.json` der Website.

@@ -16,7 +16,11 @@
  *   berichtigt   Kennung eines bestehenden Eintrags (datum-nummer[zusatz]),
  *                Pflicht bei typ berichtigung, sonst verboten
  *   erledigt     Liste von Kennungen — die „## Offen“-Punkte dieser Einträge
- *                gelten damit als erledigt (stand.mjs nimmt sie aus OFFEN.md)
+ *                gelten damit als erledigt (stand.mjs nimmt sie aus OFFEN.md).
+ *                Seit Auftrag 288 auch punktweise: `kennung#N` nimmt nur den
+ *                N-ten Aufzählungspunkt (ab 1) aus dem Offen-Block — ein
+ *                Sammelpunkt, von dem nur ein Teil erledigt ist, wird so
+ *                genommen und sein Rest im neuen Eintrag weitergeführt.
  *   archiv       Abschnitt der eingefrorenen Gedächtnis-Datei, nur autor archiv
  *
  * Darunter Prosa; ein Abschnitt „## Offen“ mit Aufzählungspunkten ist das,
@@ -37,6 +41,20 @@ export const TYPEN = ['auftrag', 'entscheidung', 'befund', 'berichtigung', 'lehr
 
 export const STATUS = ['gilt', 'aufgehoben'];
 
+/* unterlagen/ (seit Auftrag 288): abgenommene Quelldokumente, wörtlich, mit
+ * Kopf datum · bereich · status · verweis · quelle. Nur „abgenommen“ —
+ * ein Entwurf ist kein Wissen, sondern eine Aufgabe. */
+export const UNTERLAGEN_STATUS = ['abgenommen'];
+
+/* `kennung` oder `kennung#N` → { kennung, punkt } */
+export const erledigtVerweis = (s) => {
+  const m = String(s).match(/^(.+?)(?:#(\d+))?$/);
+  return { kennung: m[1], punkt: m[2] ? Number(m[2]) : null };
+};
+
+/* Die Aufzählungspunkte eines Offen-Blocks, in Reihenfolge. */
+export const offenPunkte = (block) => (block ?? '').split('\n').filter((z) => /^- /.test(z));
+
 /* Was auf oberster Ebene liegen darf — alles andere ist außerhalb der Form. */
 export const OBERSTE_EBENE = [
   'README.md',
@@ -51,6 +69,7 @@ export const OBERSTE_EBENE = [
   'lehren',
   'bereiche',
   'archiv',
+  'unterlagen',
   'scripts',
 ];
 

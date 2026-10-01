@@ -1,6 +1,6 @@
 # marketing
 
-Hebel außerhalb des Codes laufen nach `Hebel-ausserhalb-des-Codes.md` (Projektwissen, nicht im Repositorium); der Ausgangswert der Search Console vor dem Livegang steht unten, spätere Messungen im Journal.
+Hebel außerhalb des Codes laufen nach `unterlagen/Hebel-ausserhalb-des-Codes.md` (Stand 9. September 2026); der Ausgangswert der Search Console vor dem Livegang steht unten, spätere Messungen im Journal.
 
 *Wörtlich aus PROJEKTGEDAECHTNIS-2026-09-11.md; Abschnittsnummern beziehen sich darauf.*
 
@@ -92,3 +92,7 @@ Hebel außerhalb des Codes laufen nach `Hebel-ausserhalb-des-Codes.md` (Projektw
 ---
 
 *Ende. Diese Datei ist die einzige gültige Kontextdatei. Wer etwas ändert, ändert es hier.*
+
+## Unterlagen (seit Eintrag 288)
+
+- `unterlagen/Hebel-ausserhalb-des-Codes.md` — Analyse und Reihenfolge der Hebel außerhalb des Codes, Stand 9. September 2026 (Chat). *Geändert mit Eintrag 288.*

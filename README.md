@@ -26,9 +26,13 @@ wissen/
   lehren/            ANHÄNGEN — eine Datei je Lehre: 001-slug.md
   bereiche/          GEPFLEGT, aber nur über Einträge geändert: website, shop, infrastruktur, rechtstexte,
                      marke, kennzeichnung, marketing, restaurant, firma — je eine Datei
+  unterlagen/        Abgenommene Quelldokumente, wörtlich, je mit Kopf (datum, bereich, status: abgenommen,
+                     verweis auf den Auftrag, der sie nutzte, quelle mit md5) — Aufnahmen, Rechtstext-Fassungen,
+                     Analysen. Bereichsdateien verweisen darauf, statt sie zu wiederholen. Seit Auftrag 288.
   archiv/            Die alte Gedächtnis-Datei, eingefroren mit Datum; die Restliste der Wanderung; der Bauplan.
   scripts/           pruefen.mjs (Gatter) · stand.mjs (Erzeuger) · schema.mjs (die Form) ·
-                     geheimnisse.mjs (Geheimnisliste) · geheimnis-hash.mjs · wanderung.mjs (einmalig, 287)
+                     geheimnisse.mjs (Geheimnisliste) · geheimnis-hash.mjs · wanderung.mjs (einmalig, 287;
+                     hält seit 288 an, damit sie keine geänderte Bereichsdatei überschreibt)
 ```
 
 **Ein Journal-Eintrag** heißt `JJJJ-MM-TT-NNN[z]-slug.md` und beginnt mit einem Kopf, den jedes Werkzeug lesen kann:
@@ -43,7 +47,7 @@ typ: auftrag              # auftrag | entscheidung | befund | berichtigung | leh
 autor: claude-code        # oder: taib, claude-chat, archiv, <agent-name>
 betrifft: [gedaechtnis, wortmarke, gatter]
 berichtigt: 2026-09-03-276     # nur bei typ berichtigung: Kennung eines bestehenden Eintrags
-erledigt: [2026-09-10-286]     # die „## Offen“-Punkte dieser Einträge gelten damit als erledigt
+erledigt: [2026-09-10-286, 2026-09-11-287#4]   # ganzer Offen-Block, oder mit #N nur Punkt N (ab 1)
 archiv: 11.49                  # nur autor archiv: Abschnitt der eingefrorenen Datei
 ---
 # Titel
@@ -55,6 +59,8 @@ Was passiert ist, in fünf bis zwanzig Sätzen. Was gemessen wurde.
 ```
 
 Die Kennung eines Eintrags ist `datum-nummer[zusatz]` (etwa `2026-09-11-287`). Die Listen für `bereich` und `typ` stehen in `scripts/schema.mjs`; wer eine erweitert, tut es dort, und das Gatter kennt sie danach.
+
+**Erledigt melden:** Ein späterer Eintrag nennt unter `erledigt:` die Kennung — dann fällt der ganze Offen-Block des genannten Eintrags aus `OFFEN.md` — oder `kennung#N`, dann nur dessen N-ter Punkt. Ist von einem Sammelpunkt nur ein Teil erledigt, wird der Punkt genommen und sein Rest im neuen Eintrag unter „## Offen“ weitergeführt; fremde Einträge werden nie geändert.
 
 **Eine Entscheidung** heißt `NNNN-slug.md`, trägt im Kopf `status: gilt | aufgehoben`, `datum` und bei aufgehoben `aufgehoben_durch: NNNN`, und darunter Kontext, Entscheidung, Begründung, Status.
 

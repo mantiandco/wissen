@@ -19,7 +19,7 @@
  * spätere Dateiname. */
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { BEREICHE, JOURNAL_DATEI, kopf, kennung } from './schema.mjs';
+import { BEREICHE, JOURNAL_DATEI, kopf, kennung, erledigtVerweis, offenPunkte } from './schema.mjs';
 
 const KOPF_STAND =
   '# Stand\n\n*Erzeugt von `scripts/stand.mjs` aus `journal/` und `bereiche/` — nicht von Hand ändern; `npm run stand` erzeugt neu. Je Bereich: die Kopfzeile der Bereichsdatei und der jüngste Journal-Eintrag.*\n';
@@ -59,7 +59,7 @@ const ersterAbsatz = (rest) => {
 
 /* Zeilenweise, nicht per Regex bis zum Dateiende: JavaScript kennt kein \Z,
    und ein lazy-Muster endete am ersten großen Z im Text (Auftrag 287). */
-const offenBlock = (rest) => {
+export const offenBlock = (rest) => {
   const zeilen = rest.split('\n');
   const start = zeilen.findIndex((z) => /^## Offen\s*$/.test(z));
   if (start < 0) return null;
@@ -87,12 +87,29 @@ export const kopfzeile = (root, bereich) => {
   return null;
 };
 
+export const erledigtListe = (f) => (Array.isArray(f.erledigt) ? f.erledigt : f.erledigt ? [f.erledigt] : []);
+
 export function erzeuge(root) {
   const alle = eintraege(root);
-  const erledigt = new Set(alle.flatMap((e) => (Array.isArray(e.felder.erledigt) ? e.felder.erledigt : e.felder.erledigt ? [e.felder.erledigt] : [])));
-  /* Erledigt zählt nur, wenn der nennende Eintrag später ist als der genannte. */
-  const spaeterErledigt = (e) =>
-    alle.some((s) => vergleich(s, e) > 0 && (Array.isArray(s.felder.erledigt) ? s.felder.erledigt : s.felder.erledigt ? [s.felder.erledigt] : []).includes(e.kennung));
+  /* Erledigt zählt nur, wenn der nennende Eintrag später ist als der genannte.
+     Ganze Kennung → der ganze Offen-Block fällt; kennung#N → nur Punkt N. */
+  const verweiseAuf = (e) =>
+    alle
+      .filter((s) => vergleich(s, e) > 0)
+      .flatMap((s) => erledigtListe(s.felder).map(erledigtVerweis))
+      .filter((v) => v.kennung === e.kennung);
+  const offenRest = (e) => {
+    const block = offenBlock(e.rest);
+    if (!block) return null;
+    const v = verweiseAuf(e);
+    if (v.some((x) => x.punkt === null)) return null;
+    const weg = new Set(v.map((x) => x.punkt));
+    if (!weg.size) return block;
+    let n = 0;
+    const zeilen = block.split('\n').filter((z) => (/^- /.test(z) ? !weg.has(++n) : !weg.has(n)));
+    const rest = zeilen.join('\n').trim();
+    return offenPunkte(rest).length ? rest : null;
+  };
 
   let stand = KOPF_STAND;
   let offen = KOPF_OFFEN;
@@ -108,15 +125,14 @@ export function erzeuge(root) {
       if (a) stand += `${a}\n`;
     } else stand += '**Jüngster Eintrag:** (kein Journal-Eintrag)\n';
 
-    const offene = eigene.filter((e) => offenBlock(e.rest) && !spaeterErledigt(e));
+    const offene = eigene.map((e) => ({ e, rest: offenRest(e) })).filter((x) => x.rest);
     if (offene.length) {
       offen += `\n## ${bereich}\n`;
-      for (const e of offene) {
-        offen += `\n### ${e.felder.datum} · ${e.felder.nummer}${e.felder.zusatz ?? ''} · ${e.titel} (\`journal/${e.name}\`)\n\n${offenBlock(e.rest)}\n`;
+      for (const { e, rest } of offene) {
+        offen += `\n### ${e.felder.datum} · ${e.felder.nummer}${e.felder.zusatz ?? ''} · ${e.titel} (\`journal/${e.name}\`)\n\n${rest}\n`;
       }
     }
   }
-  void erledigt;
   return { stand, offen };
 }
 

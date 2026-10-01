@@ -78,3 +78,10 @@ Begründung: Zwei getrennt gepflegte Texte laufen auseinander. Dasselbe Prinzip 
 **Der Freund ist Rechtsanwalt und weiß, dass es ein KI-Entwurf ist. Taib übernimmt die Verantwortung ausdrücklich.**
 
 **Reihenfolge:** Erst geben, wenn Foodamigos geantwortet hat. Sonst bekommt er einen Entwurf mit Lücken statt einen mit Fragen.
+
+## Unterlagen (seit Eintrag 288)
+
+- `unterlagen/Datenschutzerklaerung-Livegang.md` — Datenschutzerklärung, Fassung zum Livegang, de/en, mit den Varianten [A]/[B] zur Karten-Zustimmung (eingesetzt in Auftrag 276; die veröffentlichte Fassung steht in `src/content/copy/legal/datenschutz.json` der Website).
+- `unterlagen/Datenschutz-Absatz-Cloudflare.md` — Absatz Hosting (Cloudflare Pages), de/en, Entwurf zur Anwalts-Gegenlese, Stand 2. September 2026.
+
+*Geändert mit Eintrag 288.*

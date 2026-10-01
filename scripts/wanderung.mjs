@@ -27,6 +27,14 @@ const ROOT = resolve('.');
 const ARCHIVNAME = 'PROJEKTGEDAECHTNIS-2026-09-11.md';
 const DOCS = join(REPO, 'docs');
 
+/* Einmalig (Auftrag 287). Seit Bereichsdateien über Einträge geändert werden
+   (ab 288), würde ein zweiter Lauf diese Änderungen überschreiben — deshalb
+   hält das Skript an, sobald ein Eintrag mit autor ≠ archiv eine Bereichsdatei
+   betrifft, außer mit --erneut. */
+if (!process.argv.includes('--erneut') && existsSync(join(ROOT, 'journal')) && readdirSync(join(ROOT, 'journal')).some((f) => !/^autor: archiv$/m.test(readFileSync(join(ROOT, 'journal', f), 'utf8')) && /^nummer: (\d+)$/m.test(readFileSync(join(ROOT, 'journal', f), 'utf8')) && Number(readFileSync(join(ROOT, 'journal', f), 'utf8').match(/^nummer: (\d+)$/m)[1]) >= 288)) {
+  console.log('Die Wanderung ist gelaufen (287); seither ändern Einträge die Bereichsdateien. Ein erneuter Lauf überschriebe sie — nur mit --erneut.');
+  process.exit(1);
+}
 const text = readFileSync(QUELLE, 'utf8');
 const md5 = createHash('md5').update(text).digest('hex');
 const zeilen = text.split('\n');

@@ -25,9 +25,9 @@
 import { readdirSync, readFileSync, statSync, existsSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { BEREICHE, TYPEN, STATUS, OBERSTE_EBENE, JOURNAL_DATEI, ENTSCHEIDUNG_DATEI, LEHRE_DATEI, kopf, kennung, slug } from './schema.mjs';
+import { BEREICHE, TYPEN, STATUS, UNTERLAGEN_STATUS, OBERSTE_EBENE, JOURNAL_DATEI, ENTSCHEIDUNG_DATEI, LEHRE_DATEI, kopf, kennung, slug, erledigtVerweis, offenPunkte } from './schema.mjs';
 import { WORTPRUEFSUMMEN, MUSTER, hashWort, woerter } from './geheimnisse.mjs';
-import { erzeuge } from './stand.mjs';
+import { erzeuge, offenBlock } from './stand.mjs';
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 const datumGueltig = (d) => ISO.test(d) && !Number.isNaN(Date.parse(d)) && new Date(d).toISOString().slice(0, 10) === d;
@@ -90,14 +90,18 @@ export function pruefe(root, { pruefsummen = WORTPRUEFSUMMEN, standPruefen = tru
     }
     const ken = kennung(felder);
     kennungen.add(ken);
-    eintraege.push({ ort, felder, ken });
+    eintraege.push({ ort, felder, ken, punkte: offenPunkte(offenBlock(rest)).length });
   }
   /* Verweise und Fortlaufen — erst, wenn alle Kennungen bekannt sind. */
   const nummern = eintraege.filter((e) => /^\d+$/.test(String(e.felder.nummer)));
   for (const e of eintraege) {
     if (e.felder.berichtigt && !kennungen.has(String(e.felder.berichtigt))) fehler.push(`${e.ort}: berichtigt nennt „${e.felder.berichtigt}“ — kein Eintrag mit dieser Kennung`);
-    for (const k of Array.isArray(e.felder.erledigt) ? e.felder.erledigt : e.felder.erledigt ? [e.felder.erledigt] : [])
-      if (!kennungen.has(String(k))) fehler.push(`${e.ort}: erledigt nennt „${k}“ — kein Eintrag mit dieser Kennung`);
+    for (const k of Array.isArray(e.felder.erledigt) ? e.felder.erledigt : e.felder.erledigt ? [e.felder.erledigt] : []) {
+      const v = erledigtVerweis(k);
+      const ziel = eintraege.find((x) => x.ken === v.kennung);
+      if (!ziel) fehler.push(`${e.ort}: erledigt nennt „${k}“ — kein Eintrag mit dieser Kennung`);
+      else if (v.punkt !== null && (v.punkt < 1 || v.punkt > ziel.punkte)) fehler.push(`${e.ort}: erledigt nennt „${k}“ — ${v.kennung} hat ${ziel.punkte} Offen-Punkt(e)`);
+    }
     if (e.felder.autor && e.felder.autor !== 'archiv' && e.felder.typ === 'auftrag' && /^\d+$/.test(String(e.felder.nummer))) {
       const frueher = nummern.filter((f) => f !== e && f.felder.typ === 'auftrag' && String(f.felder.datum) < String(e.felder.datum));
       const hoechste = Math.max(-1, ...frueher.map((f) => Number(f.felder.nummer)));
@@ -138,6 +142,23 @@ export function pruefe(root, { pruefsummen = WORTPRUEFSUMMEN, standPruefen = tru
     zahl.lehren += 1;
     if (!LEHRE_DATEI.test(name)) fehler.push(`lehren/${name}: Dateiname nicht in der Form NNN-slug.md`);
     else if (!/^# /m.test(readFileSync(join(ldir, name), 'utf8'))) fehler.push(`lehren/${name}: keine Überschrift „# …“`);
+  }
+
+  /* Unterlagen — abgenommene Quelldokumente, wörtlich, mit Kopf. */
+  const udir = join(root, 'unterlagen');
+  zahl.unterlagen = 0;
+  for (const name of existsSync(udir) ? readdirSync(udir).sort() : []) {
+    if (name === '.DS_Store') continue;
+    zahl.unterlagen += 1;
+    const ort = `unterlagen/${name}`;
+    if (!name.endsWith('.md')) { fehler.push(`${ort}: nur .md-Dateien`); continue; }
+    const { felder, fehler: kf } = kopf(readFileSync(join(udir, name), 'utf8'));
+    for (const f of kf) fehler.push(`${ort}: ${f}`);
+    if (!felder) continue;
+    if (!datumGueltig(String(felder.datum ?? ''))) fehler.push(`${ort}: datum fehlt oder ungültig (${felder.datum ?? '—'})`);
+    if (!BEREICHE.includes(felder.bereich)) fehler.push(`${ort}: bereich „${felder.bereich ?? '—'}“ nicht in der Liste`);
+    if (!UNTERLAGEN_STATUS.includes(felder.status)) fehler.push(`${ort}: status „${felder.status ?? '—'}“ nicht in (${UNTERLAGEN_STATUS.join(' | ')})`);
+    if (!felder.verweis) fehler.push(`${ort}: verweis fehlt (welcher Auftrag die Unterlage nutzte)`);
   }
 
   /* Bereiche */
@@ -212,6 +233,18 @@ gefallen += probe('Dateiname passt nicht zum Kopf → rot', ({ eintrag }) => ein
 gefallen += probe('aufgehobene Entscheidung ohne Nachfolger → rot', ({ dir }) => writeFileSync(join(dir, 'entscheidungen', '0001-alt.md'), '---\nstatus: aufgehoben\naufgehoben_durch: 0009\n---\n# Alt\n'), (f) => f.some((x) => x.includes('aufgehoben_durch nennt 0009')));
 gefallen += probe('Datei außerhalb der Form → rot', ({ dir }) => writeFileSync(join(dir, 'NOTIZ.txt'), 'x'), (f) => f.some((x) => x.includes('außerhalb der Form: NOTIZ.txt')));
 gefallen += probe('STAND.md nicht aktuell → rot', ({ dir }) => writeFileSync(join(dir, 'STAND.md'), '# Stand\n\nveraltet\n'), (f) => f.some((x) => x.includes('STAND.md ist nicht aktuell')));
+gefallen += probe('Unterlage ohne status → rot', ({ dir }) => { mkdirSync(join(dir, 'unterlagen')); writeFileSync(join(dir, 'unterlagen', 'x.md'), '---\ndatum: 2026-09-02\nbereich: marketing\nverweis: 276\n---\n# X\n'); }, (f) => f.some((x) => x.includes('unterlagen/x.md: status')));
+gefallen += probe('erledigt kennung#N außerhalb der Punkte → rot', ({ eintrag }) => {
+  eintrag('2026-09-02-277-offen.md', 'datum: 2026-09-02\nnummer: 277\nbereich: shop\ntyp: befund\nautor: taib', '# Offenes\n\n## Offen\n- Punkt A\n- Punkt B\n');
+  eintrag('2026-09-03-278-zu.md', 'datum: 2026-09-03\nnummer: 278\nbereich: shop\ntyp: befund\nautor: taib\nerledigt: [2026-09-02-277#3]', '# Zu\n');
+}, (f) => f.some((x) => x.includes('hat 2 Offen-Punkt')));
+gefallen += probe('erledigt kennung#N nimmt nur diesen Punkt', ({ eintrag, dir }) => {
+  eintrag('2026-09-02-277-offen.md', 'datum: 2026-09-02\nnummer: 277\nbereich: shop\ntyp: befund\nautor: taib', '# Offenes\n\n## Offen\n- Punkt A\n- Punkt B\n');
+  eintrag('2026-09-03-278-zu.md', 'datum: 2026-09-03\nnummer: 278\nbereich: shop\ntyp: befund\nautor: taib\nerledigt: [2026-09-02-277#1]', '# Zu\n');
+  const { offen } = erzeuge(dir);
+  writeFileSync(join(dir, 'OFFEN.md'), offen);
+  if (offen.includes('Punkt A') || !offen.includes('Punkt B')) writeFileSync(join(dir, 'lehren', 'x.md'), 'falsch');
+}, (f) => !f.some((x) => x.includes('lehren/x.md')));
 gefallen += probe('erledigt nimmt Offenes aus OFFEN.md', ({ eintrag, dir }) => {
   eintrag('2026-09-02-277-offen.md', 'datum: 2026-09-02\nnummer: 277\nbereich: shop\ntyp: befund\nautor: taib', '# Offenes\n\n## Offen\n- Punkt A\n');
   eintrag('2026-09-03-278-zu.md', 'datum: 2026-09-03\nnummer: 278\nbereich: shop\ntyp: befund\nautor: taib\nerledigt: [2026-09-02-277]', '# Zu\n\nerledigt.\n');
@@ -219,7 +252,7 @@ gefallen += probe('erledigt nimmt Offenes aus OFFEN.md', ({ eintrag, dir }) => {
   writeFileSync(join(dir, 'OFFEN.md'), offen);
   if (offen.includes('Punkt A')) writeFileSync(join(dir, 'lehren', 'x.md'), 'Punkt A steht noch in OFFEN');
 }, (f) => !f.some((x) => x.includes('lehren/x.md')));
-console.log(`  ${13 - gefallen} von 13 Proben bestanden.\n`);
+console.log(`  ${16 - gefallen} von 16 Proben bestanden.\n`);
 if (gefallen) {
   console.log('PRUEFEN GATE: FAIL (Selbsttest)');
   process.exit(1);
@@ -227,7 +260,7 @@ if (gefallen) {
 
 const root = process.argv[2] ?? '.';
 const { fehler, zahl } = pruefe(root);
-console.log(`Bestand: ${zahl.journal} Journal-Einträge, ${zahl.entscheidungen} Entscheidungen, ${zahl.lehren} Lehren, ${zahl.bereiche} Bereichsdateien; ${zahl.dateien} .md-Dateien auf Geheimnisse geprüft (Wortprüfsummen eingetragen: ${WORTPRUEFSUMMEN.length}).`);
+console.log(`Bestand: ${zahl.journal} Journal-Einträge, ${zahl.entscheidungen} Entscheidungen, ${zahl.lehren} Lehren, ${zahl.bereiche} Bereichsdateien, ${zahl.unterlagen} Unterlagen; ${zahl.dateien} .md-Dateien auf Geheimnisse geprüft (Wortprüfsummen eingetragen: ${WORTPRUEFSUMMEN.length}).`);
 for (const f of fehler) console.log(`  ✗ ${f}`);
 console.log(fehler.length === 0 ? '\nPRUEFEN GATE: pass' : `\nPRUEFEN GATE: FAIL (${fehler.length})`);
 process.exit(fehler.length === 0 ? 0 : 1);
